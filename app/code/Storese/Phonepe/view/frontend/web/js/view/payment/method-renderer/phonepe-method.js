@@ -151,7 +151,8 @@ define(
                         // fullScreenLoader.stopLoader();
                         console.log(JSON.stringify(response));
                         if (response.success) {
-                            if (response.data.code === "PAYMENT_SUCCESS") {
+                            console.log('response.code' + response.code);
+                            if (response.code === "PAYMENT_SUCCESS") {
                                 self.placeOrder();
                             } else {
                                 console.log('Payment Unsuccessfull');
