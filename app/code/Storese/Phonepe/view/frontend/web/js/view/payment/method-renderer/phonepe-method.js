@@ -108,7 +108,7 @@ define(
 
             renderIframe: function (data) {
                 var self = this;
-                console.log('type od data : '+typeof data);
+                console.log('type od data : ' + typeof data);
                 console.log('data1 : ' + JSON.stringify(data));
                 var reservationData = data.data.reservationId;
                 console.log(reservationData);
@@ -118,9 +118,7 @@ define(
                         .then((response) => {
                             // const { user, cartProducts, cartTotal, coupon } = this.props;
                             console.log("PhonePe proceedToPay resp: " + JSON.stringify(response));
-                            if (response.code === 'SUCCESS') {
-                                self.checkStatus(response.data.transactionId);
-                            }
+                            self.checkStatus(response.data.transactionId);
                             // this.props.checkStatus(nextProps.reservationData.transactionId, user, cartProducts, cartTotal, coupon);
                             //Make changes to show loader till we go to running-order page
 

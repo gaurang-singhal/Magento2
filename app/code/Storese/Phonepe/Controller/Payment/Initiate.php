@@ -73,13 +73,21 @@ class Initiate extends \Magento\Framework\App\Action\Action
             "request" => $tmp_body_field
         ];
         $apiResponse = $this->_helper->callCurlInitPost($url, $headers, $data);
+//        var_dump($apiResponse);
+        $var = $this->jsonHelper->jsonDecode($apiResponse);
+//        var_dump($var);
+        if ($var['code'] == 'SUCCESS' && $var['success'] == true) {
+            $var['data']['transactionId'] = $this->generateTransactionIdForPhonePe('TI', $this->getQuote()->getId());
+        }
+//        echo json_encode($var);
 //        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 ////        $response->setData($this->jsonHelper->jsonDecode($apiResponse));
 ////        $response->setHttpResponseCode(200);
 ////        return $response;
 //        return $this->jsonHelper->jsonDecode($apiResponse);
         $result = $this->resultJsonFactory->create();
-        $result->setData($this->jsonHelper->jsonDecode($apiResponse));
+        $result->setData($var);
+//        $result->setData($this->jsonHelper->jsonDecode($apiResponse));
         return $result;
     }
 
