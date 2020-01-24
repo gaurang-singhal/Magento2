@@ -7,6 +7,7 @@ use Magento\Checkout\Model\Cart;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Psr\Log\LoggerInterface;
 use Storese\Phonepe\Helper\Api as helper;
 
 class Status extends \Magento\Framework\App\Action\Action
@@ -27,7 +28,7 @@ class Status extends \Magento\Framework\App\Action\Action
         ProductFactory $product,
         Cart $modelCart,
         helper $helper,
-        \Magento\Payment\Model\Method\Logger $logger
+        LoggerInterface $logger
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
@@ -47,9 +48,10 @@ class Status extends \Magento\Framework\App\Action\Action
     }
     public function checkStatusPhonePe($request)
     {
-//        $this->logger->debug('inside checkstatus');
+        $this->logger->debug('inside checkstatus');
         $merchantId = 'PERPULENTEST';
         $transactionId = $request['transactionID'];
+//        $this->logger->debug('transactionId : ' . $transactionId);
 //        $order = \App\Order::where('transaction_id', $transactionId)->first();
         //        if ($order && $order->payment_code !== 'PAYMENT_PENDING') {
         //            return response()->json([
@@ -59,12 +61,14 @@ class Status extends \Magento\Framework\App\Action\Action
         //        $transactionId = $order->transaction_id;
         $url = 'https://apps-uat.phonepe.com/v3/transaction/' . $merchantId . '/' . $transactionId . '/status';
         //        print $url;
-        $x_verify = hash('sha256', '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status') . '33fba4d9-a996-4aee-b45e-49e2ddfcda61' . '###1';
+        $x_verify = hash('sha256', '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###1';
         $headers = [
             'x-client-id: ' . 'PERPULENTEST',
             'x-verify: ' . $x_verify
         ];
-
+        $this->logger->debug('url : ' . $url);
+        $this->logger->debug('headers : ' . json_encode($headers));
+//        $this->logger->debug('headers : ' . $headers);
         $result = $this->_helper->callCurlInitGet($url, $headers);
         $var = $this->jsonHelper->jsonDecode($result);
         $response = $this->resultJsonFactory->create();
