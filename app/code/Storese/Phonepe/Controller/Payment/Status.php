@@ -51,16 +51,7 @@ class Status extends \Magento\Framework\App\Action\Action
         $this->logger->debug('inside checkstatus');
         $merchantId = 'PERPULENTEST';
         $transactionId = $request['transactionID'];
-//        $this->logger->debug('transactionId : ' . $transactionId);
-//        $order = \App\Order::where('transaction_id', $transactionId)->first();
-        //        if ($order && $order->payment_code !== 'PAYMENT_PENDING') {
-        //            return response()->json([
-        //                'code' => $order->payment_code
-        //            ]);
-        //        }
-        //        $transactionId = $order->transaction_id;
         $url = 'https://apps-uat.phonepe.com/v3/transaction/' . $merchantId . '/' . $transactionId . '/status';
-        //        print $url;
         $x_verify = hash('sha256', '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###1';
         $headers = [
             'x-client-id: ' . 'PERPULENTEST',

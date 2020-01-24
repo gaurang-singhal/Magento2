@@ -17,7 +17,7 @@ class Initiate extends \Magento\Framework\App\Action\Action
     protected $_modelCart;
     protected $_helper;
     protected $jsonHelper;
-    protected $quote;
+    protected $quote1;
     protected $logger;
 
     public function __construct(
@@ -53,12 +53,13 @@ class Initiate extends \Magento\Framework\App\Action\Action
     {
         $quote = $this->checkoutSession->getQuote();
         $transactionContextArray = json_encode($this->generatePhonePeCart($quote->getId()), JSON_UNESCAPED_SLASHES);
+        $tId =$this->generateTransactionIdForPhonePe('TI', $quote->getId());
         $req_body = [
             'merchantId' => 'PERPULENTEST',
             "amount" => (int)(round($quote->getGrandTotal(), 2) * 100),
             "validFor" => 600000,
             // "subMerchantId" => Constants::getSubMerchantId($brand),
-            "transactionId" => $this->generateTransactionIdForPhonePe('TI', $quote->getId()),
+            "transactionId" => $tId,
             "merchantOrderId" => $quote->getId(),
             "transactionContext" => base64_encode($transactionContextArray)
         ];
@@ -80,13 +81,13 @@ class Initiate extends \Magento\Framework\App\Action\Action
         $var = $this->jsonHelper->jsonDecode($apiResponse);
 //        var_dump($var);
         if ($var['code'] == 'SUCCESS' && $var['success'] == true) {
-            $var['data']['transactionId'] = $this->generateTransactionIdForPhonePe('TI', $this->getQuote()->getId());
+            $var['data']['transactionId'] = $tId;
         }
 //        echo json_encode($var);
 //        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-////        $response->setData($this->jsonHelper->jsonDecode($apiResponse));
-////        $response->setHttpResponseCode(200);
-////        return $response;
+        ////        $response->setData($this->jsonHelper->jsonDecode($apiResponse));
+        ////        $response->setHttpResponseCode(200);
+        ////        return $response;
 //        return $this->jsonHelper->jsonDecode($apiResponse);
         $result = $this->resultJsonFactory->create();
         $result->setData($var);
@@ -125,9 +126,9 @@ class Initiate extends \Magento\Framework\App\Action\Action
 
     protected function getQuote()
     {
-        if (!$this->quote) {
-            $this->quote = $this->checkoutSession->getQuote();
+        if (!$this->quote1) {
+            $this->quote1 = $this->checkoutSession->getQuote();
         }
-        return $this->quote;
+        return $this->quote1;
     }
 }
