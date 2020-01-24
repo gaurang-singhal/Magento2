@@ -169,7 +169,7 @@ define(
                      * @param {*} response
                      */
                     error: function (response) {
-                        console.log('error : ' + response);
+                        console.log('error : ' + JSON.stringify(response));
                         alert('error in check status');
 
                         // fullScreenLoader.stopLoader();
