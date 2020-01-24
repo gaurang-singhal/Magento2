@@ -118,7 +118,7 @@ define(
                         .then((response) => {
                             // const { user, cartProducts, cartTotal, coupon } = this.props;
                             console.log("PhonePe proceedToPay resp: " + JSON.stringify(response));
-                            self.checkStatus(response.data.transactionId);
+                            self.checkStatus(data.data.transactionId);
                             // this.props.checkStatus(nextProps.reservationData.transactionId, user, cartProducts, cartTotal, coupon);
                             //Make changes to show loader till we go to running-order page
 
@@ -136,7 +136,7 @@ define(
             checkStatus: function (transactionID) {
 
                 var self = this;
-
+                console.log('inside checkstatus');
                 $.ajax({
                     type: 'POST',
                     url: url.build('phonepe/payment/status'),
