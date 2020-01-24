@@ -108,16 +108,17 @@ define(
 
             renderIframe: function (data) {
                 var self = this;
-
-                console.log('data1 : ' + data);
-                var reservationData = data.data.data;
+                console.log('type od data : '+typeof data);
+                console.log('data1 : ' + JSON.stringify(data));
+                var reservationData = data.data.reservationId;
+                console.log(reservationData);
                 window.PhonePe.PhonePe.build(window.PhonePe.Constants.Species.web).then((sdk) => {
                     // this.setState({ loading: true })
-                    sdk.proceedToPay(nextProps.reservationData.reservationId, "https://storese.in")
+                    sdk.proceedToPay(reservationData, "https://storese.in")
                         .then((response) => {
                             // const { user, cartProducts, cartTotal, coupon } = this.props;
                             console.log("PhonePe proceedToPay resp: " + JSON.stringify(response));
-                            if (response.code == 'SUCCESS') {
+                            if (response.code === 'SUCCESS') {
                                 self.checkStatus(response.data.transactionId);
                             }
                             // this.props.checkStatus(nextProps.reservationData.transactionId, user, cartProducts, cartTotal, coupon);
@@ -176,6 +177,16 @@ define(
                         // self.isPaymentProcessing.reject(response.message);
                     }
                 });
+            },
+
+            handleError: function (error) {
+                if (_.isObject(error)) {
+                    this.messageContainer.addErrorMessage(error);
+                } else {
+                    this.messageContainer.addErrorMessage({
+                        message: error
+                    });
+                }
             },
         });
     }
