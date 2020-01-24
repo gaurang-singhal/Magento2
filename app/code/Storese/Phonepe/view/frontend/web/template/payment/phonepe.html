@@ -27,7 +27,7 @@
                 <button class="action primary checkout"
                         type="submit"
                         data-bind="
-                        click:function(){preparePayment()},
+                        click:function(){initiateLogin()},
                         attr: {title: $t('Place Order')},
                         css: {disabled: !isPlaceOrderActionAllowed()},
                         enable: (getCode() == isChecked())
