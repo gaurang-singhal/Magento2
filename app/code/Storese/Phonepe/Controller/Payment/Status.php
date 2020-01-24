@@ -47,7 +47,7 @@ class Status extends \Magento\Framework\App\Action\Action
     }
     public function checkStatusPhonePe($request)
     {
-        $this->logger->debug('inside checkstatus');
+//        $this->logger->debug('inside checkstatus');
         $merchantId = 'PERPULENTEST';
         $transactionId = $request['transactionID'];
 //        $order = \App\Order::where('transaction_id', $transactionId)->first();
