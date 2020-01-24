@@ -17,6 +17,7 @@ class Status extends \Magento\Framework\App\Action\Action
     protected $_modelCart;
     protected $_helper;
     protected $jsonHelper;
+    protected $logger;
 
     public function __construct(
         Context $context,
@@ -25,7 +26,8 @@ class Status extends \Magento\Framework\App\Action\Action
         CheckoutSession $checkoutSession,
         ProductFactory $product,
         Cart $modelCart,
-        helper $helper
+        helper $helper,
+        \Magento\Payment\Model\Method\Logger $logger
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
@@ -33,6 +35,7 @@ class Status extends \Magento\Framework\App\Action\Action
         $this->_modelCart = $modelCart;
         $this->_helper = $helper;
         $this->jsonHelper = $jsonHelper;
+        $this->logger = $logger;
 
         return parent::__construct($context);
     }
@@ -44,6 +47,7 @@ class Status extends \Magento\Framework\App\Action\Action
     }
     public function checkStatusPhonePe($request)
     {
+        $this->logger->debug('inside checkstatus');
         $merchantId = 'PERPULENTEST';
         $transactionId = $request['transactionID'];
 //        $order = \App\Order::where('transaction_id', $transactionId)->first();

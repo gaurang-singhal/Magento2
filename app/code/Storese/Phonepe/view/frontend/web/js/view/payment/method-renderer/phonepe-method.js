@@ -118,6 +118,7 @@ define(
                         .then((response) => {
                             // const { user, cartProducts, cartTotal, coupon } = this.props;
                             console.log("PhonePe proceedToPay resp: " + JSON.stringify(response));
+                            console.log('transactionId: '+data.data.transactionId);
                             self.checkStatus(data.data.transactionId);
                             // this.props.checkStatus(nextProps.reservationData.transactionId, user, cartProducts, cartTotal, coupon);
                             //Make changes to show loader till we go to running-order page

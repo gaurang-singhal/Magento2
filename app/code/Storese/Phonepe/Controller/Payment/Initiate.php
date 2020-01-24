@@ -18,6 +18,7 @@ class Initiate extends \Magento\Framework\App\Action\Action
     protected $_helper;
     protected $jsonHelper;
     protected $quote;
+    protected $logger;
 
     public function __construct(
         Context $context,
@@ -26,7 +27,8 @@ class Initiate extends \Magento\Framework\App\Action\Action
         CheckoutSession $checkoutSession,
         ProductFactory $product,
         Cart $modelCart,
-        helper $helper
+        helper $helper,
+        \Magento\Payment\Model\Method\Logger $logger
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
@@ -34,6 +36,7 @@ class Initiate extends \Magento\Framework\App\Action\Action
         $this->_modelCart = $modelCart;
         $this->_helper = $helper;
         $this->jsonHelper = $jsonHelper;
+        $this->logger = $logger;
 
         return parent::__construct($context);
     }
