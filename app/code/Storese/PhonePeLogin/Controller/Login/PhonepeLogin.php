@@ -65,11 +65,11 @@ class PhonepeLogin extends \Magento\Framework\App\Action\Action
     public function initiateLogin($request)
     {
         $response = $this->jsonHelper->jsonDecode($this->fetchAuthToken($request));
-        $this->logger->info('$response : ' . $response);
+        $this->logger->info('$response : ' . json_encode($response));
         if ($response['success'] == true && $response['code']== "SUCCESS") {
             $accessToken = $response['data']->accessToken;
             $loginRequest = $this->jsonHelper->jsonDecode($this->getUserDetailsFromPhonePe($request));
-            $this->logger->info('$loginRequest : ' . $loginRequest);
+            $this->logger->info('$loginRequest : ' . json_encode($loginRequest));
             if ($loginRequest['success'] == true && $loginRequest['code'] == "SUCCESS") {
                 $loginRequest['data']->provider = 'PHONEPE';
                 return $this->loginPhonepeUser($loginRequest['data']);
