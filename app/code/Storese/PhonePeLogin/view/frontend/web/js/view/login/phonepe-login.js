@@ -7,7 +7,8 @@ require(
     ],
     function (ko, $, url) {
         'use strict';
-        console.log('inside phonepe login')
+        console.log('inside phonepe login');
+        console.log('http://127.0.0.1:8888/magento2/phonepeLogin/login/Index');
         window.PhonePe.PhonePe.build(window.PhonePe.Constants.Species.web).then((sdk) => {
             //set a loader in background
             sdk.fetchAuthToken().then((res) => {
@@ -15,18 +16,23 @@ require(
                 // this.loginPhonePe(res);
                 $.ajax({
                     type: 'POST',
-                    url: url.build('phonepeLogin/login/phonepelogin'),
-                    data: {'phonePeResp': data},
-
+                    url: 'http://127.0.0.1:8888/magento2/phonepeLogin/login/phonepelogin',
+                    data: {'phonePeResp': res.grantToken},
+                    // data: {
+                    //     'mobile': '9698670828',
+                    //     'name': 'sujith'
+                    // },
                     /**
                      * Success callback
                      * @param {Object} response
                      */
                     success: function (response) {
+                        location.reload();
                         // fullScreenLoader.stopLoader();
                         console.log(JSON.stringify('login resp: ' + response));
                         if (response.success) {
                             //Do what after logging in
+                            location.reload();
                         } else {
                             console.log('Error logging in..');
                         }
