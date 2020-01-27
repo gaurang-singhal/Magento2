@@ -57,7 +57,7 @@ class PhonepeLogin extends \Magento\Framework\App\Action\Action
         $this->logger->addWriter($writer);
 
         $params = $this->getRequest()->getParams();
-        $this->logger->info('params : ' . $params);
+        $this->logger->info('params : ' . json_encode($params));
 
         return $this->initiateLogin($params);
     }
