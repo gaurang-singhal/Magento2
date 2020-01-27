@@ -81,7 +81,7 @@ class PhonepeLogin extends \Magento\Framework\App\Action\Action
 
     public function fetchAuthToken($request)
     {
-        $grantToken = $request->phonePeResp['grantToken'];
+        $grantToken = $request['phonePeResp'];
         $url = 'https://apps.phonepe.com/v3/service/auth/access';
         $fields = [
             "grantToken" => $grantToken
