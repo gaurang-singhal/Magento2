@@ -225,6 +225,7 @@ return [
         'Magento_PaypalReCaptcha' => 1,
         'MSP_TwoFactorAuth' => 1,
         'Storese_Offphonepe' => 1,
+        'Storese_PhonePeLogin' => 1,
         'Storese_Phonepe' => 1,
         'Temando_Shipping' => 1,
         'Vertex_Tax' => 1,
