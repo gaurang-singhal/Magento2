@@ -16,7 +16,8 @@ require(
                 // this.loginPhonePe(res);
                 $.ajax({
                     type: 'POST',
-                    url: 'http://127.0.0.1:8888/magento2/phonepeLogin/login/phonepelogin',
+                    url: url.build('phonepeLogin/login/phonepelogin'),
+                    // url: 'http://127.0.0.1:8888/magento2/phonepeLogin/login/phonepelogin',
                     data: {'phonePeResp': res.grantToken},
                     // data: {
                     //     'mobile': '9698670828',
