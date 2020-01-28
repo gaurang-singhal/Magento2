@@ -67,11 +67,11 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         $response = $this->resultJsonFactory->create();
         $response->setData(false);
         $response->setHttpResponseCode(400);
-        $response = $this->jsonHelper->jsonDecode($this->fetchAuthToken($request));
-        $this->logger->info('$response : ' . json_encode($response));
-        if ($response['success'] == true && $response['code']== "SUCCESS") {
-            $accessToken = $response['data']->accessToken;
-            $loginRequest = $this->jsonHelper->jsonDecode($this->getUserDetailsFromPhonePe($request));
+        $authresponse = $this->jsonHelper->jsonDecode($this->fetchAuthToken($request));
+        $this->logger->info('$authresponse : ' . json_encode($authresponse));
+        if ($authresponse['success'] == true && $authresponse['code']== "SUCCESS") {
+            $accessToken = $authresponse['data']->accessToken;
+            $loginRequest = $this->jsonHelper->jsonDecode($this->getUserDetailsFromPhonePe($accessToken));
             $this->logger->info('$loginRequest : ' . json_encode($loginRequest));
             if ($loginRequest['success'] == true && $loginRequest['code'] == "SUCCESS") {
                 $loginRequest['data']->provider = 'PHONEPE';
@@ -81,6 +81,8 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
                 }
             }
         }
+        $this->logger->info('$response : ' . json_encode($response));
+//        $this->logger->info('$response : ' . $response);
         return $response;
         // return $this->jsonHelper->jsonDecode($apiResponse);
     }
