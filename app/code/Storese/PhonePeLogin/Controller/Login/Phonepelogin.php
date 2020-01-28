@@ -9,7 +9,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Storese\Phonepe\Helper\Api as helper;
 
-class PhonepeLogin extends \Magento\Framework\App\Action\Action
+class Phonepelogin extends \Magento\Framework\App\Action\Action
 {
     protected $resultJsonFactory;
     protected $checkoutSession;
@@ -64,6 +64,9 @@ class PhonepeLogin extends \Magento\Framework\App\Action\Action
 
     public function initiateLogin($request)
     {
+        $response = $this->resultJsonFactory->create();
+        $response->setData(false);
+        $response->setHttpResponseCode(400);
         $response = $this->jsonHelper->jsonDecode($this->fetchAuthToken($request));
         $this->logger->info('$response : ' . json_encode($response));
         if ($response['success'] == true && $response['code']== "SUCCESS") {
@@ -72,10 +75,13 @@ class PhonepeLogin extends \Magento\Framework\App\Action\Action
             $this->logger->info('$loginRequest : ' . json_encode($loginRequest));
             if ($loginRequest['success'] == true && $loginRequest['code'] == "SUCCESS") {
                 $loginRequest['data']->provider = 'PHONEPE';
-                return $this->loginPhonepeUser($loginRequest['data']);
+                if ($this->loginPhonepeUser($loginRequest['data'])) {
+                    $response->setData(true);
+                    $response->setHttpResponseCode(200);
+                }
             }
         }
-        return false;
+        return $response;
         // return $this->jsonHelper->jsonDecode($apiResponse);
     }
 
