@@ -33,7 +33,8 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\Session $customerSession
-    ) {
+    )
+    {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
         $this->product = $product;
@@ -69,12 +70,12 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         $response->setHttpResponseCode(400);
         $authresponse = $this->jsonHelper->jsonDecode($this->fetchAuthToken($request));
         $this->logger->info('$authresponse : ' . json_encode($authresponse));
-        if ($authresponse['success'] == true && $authresponse['code']== "SUCCESS") {
-            $accessToken = $authresponse['data']->accessToken;
+        if ($authresponse['success'] == true && $authresponse['code'] == "SUCCESS") {
+            $accessToken = $authresponse['data']['accessToken'];
             $loginRequest = $this->jsonHelper->jsonDecode($this->getUserDetailsFromPhonePe($accessToken));
             $this->logger->info('$loginRequest : ' . json_encode($loginRequest));
             if ($loginRequest['success'] == true && $loginRequest['code'] == "SUCCESS") {
-                $loginRequest['data']->provider = 'PHONEPE';
+                $loginRequest['data']['provider'] = 'PHONEPE';
                 if ($this->loginPhonepeUser($loginRequest['data'])) {
                     $response->setData(true);
                     $response->setHttpResponseCode(200);
@@ -90,7 +91,8 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
     public function fetchAuthToken($request)
     {
         $grantToken = $request['phonePeResp'];
-        $url = 'https://apps.phonepe.com/v3/service/auth/access';
+        $this->logger->info('$grantToken : ' . $grantToken);
+        $url = 'https://apps-uat.phonepe.com/v3/service/auth/access';
         $fields = [
             "grantToken" => $grantToken
         ];
@@ -104,12 +106,14 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         $data = [
             "request" => $fields_string
         ];
+        $this->logger->info('$data : ' . json_encode($data));
+        $this->logger->info('$headers : ' . json_encode($headers));
         return $this->_helper->callCurlInitPost($url, $headers, $data);
     }
 
     public function getUserDetailsFromPhonePe($accessToken)
     {
-        $url = 'https://apps.phonepe.com/v3/service/userdetails';
+        $url = 'https://apps-uat.phonepe.com/v3/service/userdetails';
         $x_verify = hash('sha256', '/v3/service/userdetails' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###' . '1';
         $headers = [
             'content-type:application/json',
@@ -128,16 +132,16 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         $customer = $this->customerFactory->create();
         $customer->setWebsiteId($websiteId);
 //        $login = $this->getRequest()->getParams();
-        $mobile_number = $data["mobile"];
+        $mobile_number = $data["phoneNumber"];
         $customer_name = $data["name"];
         $customerCollection = $customer->getCollection()
             ->addAttributeToSelect("*")
             ->addAttributeToFilter("mobile_number", ["eq" => $mobile_number])
             ->load();
-        if (sizeof($customerCollection)>0) {
+        if (sizeof($customerCollection) > 0) {
             $this->logger->info('$customerCollection : ' . json_encode($customerCollection));
             $mail_id = '';
-            foreach ($customerCollection as $key=>$customerdata) {
+            foreach ($customerCollection as $key => $customerdata) {
                 $this->logger->info('customerdata : ' . json_encode($customerdata));
                 $mail_id = $customerdata['email'];
             }
@@ -145,7 +149,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
             $this->Login($mail_id);
             return true;
         } else {
-            $websiteId  = $this->storeManager->getWebsite()->getWebsiteId();
+            $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
 
             $firstName = $customer_name;
             $lastName = $customer_name;
