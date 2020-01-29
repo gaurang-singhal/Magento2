@@ -9,6 +9,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Psr\Log\LoggerInterface;
 use Storese\Phonepe\Helper\Api as helper;
+use Storese\Phonepe\Model\Config;
 
 class Status extends \Magento\Framework\App\Action\Action
 {
@@ -19,6 +20,7 @@ class Status extends \Magento\Framework\App\Action\Action
     protected $_helper;
     protected $jsonHelper;
     protected $logger;
+    protected $config;
 
     public function __construct(
         Context $context,
@@ -28,8 +30,10 @@ class Status extends \Magento\Framework\App\Action\Action
         ProductFactory $product,
         Cart $modelCart,
         helper $helper,
-        LoggerInterface $logger
-    ) {
+        LoggerInterface $logger,
+        Config $config
+    )
+    {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
         $this->product = $product;
@@ -37,6 +41,7 @@ class Status extends \Magento\Framework\App\Action\Action
         $this->_helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->logger = $logger;
+        $this->config = $config;
 
         return parent::__construct($context);
     }
@@ -46,15 +51,18 @@ class Status extends \Magento\Framework\App\Action\Action
         $params = $this->getRequest()->getParams();
         return $this->checkStatusPhonePe($params);
     }
+
     public function checkStatusPhonePe($request)
     {
         $this->logger->debug('inside checkstatus');
-        $merchantId = 'PERPULENTEST';
+        $merchantId = $this->config->getMerchantId();
         $transactionId = $request['transactionID'];
-        $url = 'https://apps-uat.phonepe.com/v3/transaction/' . $merchantId . '/' . $transactionId . '/status';
-        $x_verify = hash('sha256', '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###1';
+        $salt_key = $this->config->getSaltKey1();
+        $salt_index = $this->config->getSaltIndex1();
+        $url = $this->config->getApiHost() . '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status';
+        $x_verify = hash('sha256', '/v3/transaction/' . $merchantId . '/' . $transactionId . '/status' . $salt_key) . '###' . $salt_index;
         $headers = [
-            'x-client-id: ' . 'PERPULENTEST',
+            'x-client-id: ' . $this->config->getXClientId(),
             'x-verify: ' . $x_verify
         ];
         $this->logger->debug('url : ' . $url);

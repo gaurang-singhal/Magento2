@@ -1,6 +1,6 @@
 <?php
 
-namespace Storese\PhonePeLogin\Controller\Login;
+namespace Storese\Phonepe\Controller\Login;
 
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Checkout\Model\Cart;
@@ -36,8 +36,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Model\Session $customerSession,
         Config $config
-    )
-    {
+    ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
         $this->product = $product;

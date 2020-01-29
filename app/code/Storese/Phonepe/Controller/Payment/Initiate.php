@@ -8,6 +8,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Storese\Phonepe\Helper\Api as helper;
+use Storese\Phonepe\Model\Config;
 
 class Initiate extends \Magento\Framework\App\Action\Action
 {
@@ -17,8 +18,8 @@ class Initiate extends \Magento\Framework\App\Action\Action
     protected $_modelCart;
     protected $_helper;
     protected $jsonHelper;
-    protected $quote1;
     protected $logger;
+    protected $config;
 
     public function __construct(
         Context $context,
@@ -28,7 +29,8 @@ class Initiate extends \Magento\Framework\App\Action\Action
         ProductFactory $product,
         Cart $modelCart,
         helper $helper,
-        \Magento\Payment\Model\Method\Logger $logger
+        \Magento\Payment\Model\Method\Logger $logger,
+        Config $config
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
@@ -37,6 +39,7 @@ class Initiate extends \Magento\Framework\App\Action\Action
         $this->_helper = $helper;
         $this->jsonHelper = $jsonHelper;
         $this->logger = $logger;
+        $this->config = $config;
 
         return parent::__construct($context);
     }
@@ -53,9 +56,10 @@ class Initiate extends \Magento\Framework\App\Action\Action
     {
         $quote = $this->checkoutSession->getQuote();
         $transactionContextArray = json_encode($this->generatePhonePeCart($quote->getId()), JSON_UNESCAPED_SLASHES);
-        $tId =$this->generateTransactionIdForPhonePe('TI', $quote->getId());
+        $tId = $this->generateTransactionIdForPhonePe('TI', $quote->getId());
         $req_body = [
-            'merchantId' => 'PERPULENTEST',
+//            'merchantId' => 'PERPULENTEST',
+            'merchantId' => $this->config->getMerchantId(),
             "amount" => (int)(round($quote->getGrandTotal(), 2) * 100),
             "validFor" => 600000,
             // "subMerchantId" => Constants::getSubMerchantId($brand),
@@ -63,13 +67,18 @@ class Initiate extends \Magento\Framework\App\Action\Action
             "merchantOrderId" => $quote->getId(),
             "transactionContext" => base64_encode($transactionContextArray)
         ];
-        $url = 'https://apps-uat.phonepe.com/v3/transaction/initiate';
+//        if(Constants::getEnv()=='prod'){
+//            $req_body['subMerchantId'] = Constants::getSubMerchantId($brand);
+//        }
+        $url = $this->config->getApiHost() . '/v3/transaction/initiate';
+        $salt_key = $this->config->getSaltKey1();
+        $salt_index = $this->config->getSaltIndex1();
         $tmp_body_field = base64_encode(json_encode($req_body));
-        $x_verify = hash('sha256', $tmp_body_field . '/v3/transaction/initiate' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###' . 1;
+        $x_verify = hash('sha256', $tmp_body_field . '/v3/transaction/initiate' . $salt_key) . '###' . $salt_index;
         $callback_url = 'https://dashboard.storese.in/api/phonePe-callback';
         $headers = [
             'content-type: application/json',
-            'x-client-id: ' . 'PERPULENTEST',
+            'x-client-id: ' . $this->config->getXClientId(),
             'x-verify: ' . $x_verify,
             'x-callback-url: ' . $callback_url
         ];
@@ -77,13 +86,10 @@ class Initiate extends \Magento\Framework\App\Action\Action
             "request" => $tmp_body_field
         ];
         $apiResponse = $this->_helper->callCurlInitPost($url, $headers, $data);
-//        var_dump($apiResponse);
         $var = $this->jsonHelper->jsonDecode($apiResponse);
-//        var_dump($var);
         if ($var['code'] == 'SUCCESS' && $var['success'] == true) {
             $var['data']['transactionId'] = $tId;
         }
-//        echo json_encode($var);
 //        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         ////        $response->setData($this->jsonHelper->jsonDecode($apiResponse));
         ////        $response->setHttpResponseCode(200);
@@ -97,12 +103,11 @@ class Initiate extends \Magento\Framework\App\Action\Action
 
     public function generatePhonePeCart($orderId)
     {
-        $feedback_base_url = 'https://preprod.storese.in/feedback/';
-        $value = [
+        $feedback_base_url = $this->config->getFeedBaseUrl();
+        return [
             "orderContext" => [
                 "trackingInfo" => [
                     "type" => "HTTPS",
-                    // "url" => Constants::$feedback_base_url . Order::where('unique_order_id', $order->unique_order_id)->first()->unique_order_id
                     "url" => $feedback_base_url . $orderId
                 ]
             ],
@@ -110,12 +115,7 @@ class Initiate extends \Magento\Framework\App\Action\Action
                 "totalAmount" => (int)(round($this->getQuote()->getGrandTotal(), 2) * 100),
                 "payableAmount" => (int)(round($this->getQuote()->getGrandTotal(), 2) * 100)
             ]
-//            "cartDetails" => [
-//                "cartItems" => $cartItemsList
-//            ]
-
         ];
-        return $value;
     }
 
     public function generateTransactionIdForPhonePe($base, $orderId)
@@ -126,9 +126,6 @@ class Initiate extends \Magento\Framework\App\Action\Action
 
     protected function getQuote()
     {
-        if (!$this->quote1) {
-            $this->quote1 = $this->checkoutSession->getQuote();
-        }
-        return $this->quote1;
+        return $this->checkoutSession->getQuote();
     }
 }
