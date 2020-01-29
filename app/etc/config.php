@@ -240,7 +240,6 @@ return [
         'Magefan_WysiwygAdvanced' => 1,
         'Mageplaza_Core' => 1,
         'Mageplaza_SocialLogin' => 1,
-        'Storese_Offphonepe' => 1,
         'Storese_PhonePeLogin' => 1,
         'Storese_Phonepe' => 1,
         'Temando_Shipping' => 1,
