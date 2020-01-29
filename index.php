@@ -32,8 +32,41 @@ try {
 HTML;
     exit(1);
 }
+switch($_SERVER['HTTP_HOST']) {
+    case 'mkretail.mag.`storese.in':
+        $mageRunCode = 'mkretail_web';
+        $mageRunType = 'website';
+    break;
+    case 'farms2fresh.mag.storese.in':
+        $mageRunCode = 'farms2fresh';
+        $mageRunType = 'website';
+    break;
+    case 'towness.mag.storese.in':
+        $mageRunCode = 'towness_web';
+        $mageRunType = 'website';
+    break;
+    case 'gullymart.mag.storese.in':
+        $mageRunCode = 'gullymart_web';
+        $mageRunType = 'website';
+    break;
+    case 'wellnessforever.mag.storese.in':
+        $mageRunCode = 'wellnessforever_web';
+        $mageRunType = 'website';
+    break;
+    case 'boat.mag.storese.in':
+        $mageRunCode = 'boat_web';
+        $mageRunType = 'website';
+    break;
+    default:
+        $mageRunCode = 'base';
+        $mageRunType = 'website';
+    break;
+}
 
-$bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
+$params = $_SERVER;
+$params[\Magento\Store\Model\StoreManager::PARAM_RUN_CODE] = $mageRunCode;
+$params[\Magento\Store\Model\StoreManager::PARAM_RUN_TYPE] = $mageRunType;
+$bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $params);
 /** @var \Magento\Framework\App\Http $app */
 $app = $bootstrap->createApplication(\Magento\Framework\App\Http::class);
 $bootstrap->run($app);
