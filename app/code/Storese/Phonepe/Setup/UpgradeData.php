@@ -23,7 +23,7 @@ namespace Storese\Phonepe\Setup;
         }
         public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
         {
-            if (version_compare($context->getVersion(), '0.0.2', '<')) {
+            if (version_compare($context->getVersion(), '0.0.1', '<')) {
                 $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
 
                 $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
