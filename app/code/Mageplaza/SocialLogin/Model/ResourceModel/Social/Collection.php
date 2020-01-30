@@ -15,18 +15,15 @@
  *
  * @category    Mageplaza
  * @package     Mageplaza_SocialLogin
- * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @copyright   Copyright (c) 2016 Mageplaza (http://www.mageplaza.com/)
  * @license     https://www.mageplaza.com/LICENSE.txt
  */
-
 namespace Mageplaza\SocialLogin\Model\ResourceModel\Social;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use Mageplaza\SocialLogin\Model\ResourceModel\Social;
 
 /**
  * Class Collection
- *
  * @package Mageplaza\SocialLogin\Model\ResourceModel\Social
  */
 class Collection extends AbstractCollection
@@ -36,6 +33,6 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init(\Mageplaza\SocialLogin\Model\Social::class, Social::class);
+        $this->_init('Mageplaza\SocialLogin\Model\Social', 'Mageplaza\SocialLogin\Model\ResourceModel\Social');
     }
 }

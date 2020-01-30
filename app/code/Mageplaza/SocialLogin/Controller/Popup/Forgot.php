@@ -15,162 +15,138 @@
  *
  * @category    Mageplaza
  * @package     Mageplaza_SocialLogin
- * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @copyright   Copyright (c) 2016 Mageplaza (http://www.mageplaza.com/)
  * @license     https://www.mageplaza.com/LICENSE.txt
  */
-
 namespace Mageplaza\SocialLogin\Controller\Popup;
 
-use Exception;
-use Magento\Captcha\Helper\Data as CaptchaData;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Model\AccountManagement;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\Result\Json;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Controller\Result\Redirect;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\SecurityViolationException;
-use Mageplaza\SocialLogin\Helper\Data;
-use Zend_Validate;
-use Zend_Validate_Exception;
+use Magento\Framework\Controller\Result\JsonFactory;
 
 /**
  * Class Forgot
- *
  * @package Mageplaza\SocialLogin\Controller\Popup
  */
 class Forgot extends Action
 {
-    /**
-     * @var AccountManagementInterface
-     */
-    protected $customerAccountManagement;
+	/** @var AccountManagementInterface */
+	protected $customerAccountManagement;
 
-    /**
-     * @var Escaper
-     */
-    protected $escaper;
+	/** @var Escaper */
+	protected $escaper;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+	/**
+	 * @var Session
+	 */
+	protected $session;
 
-    /**
-     * @type JsonFactory
-     */
-    protected $resultJsonFactory;
+	/**
+	 * @type \Magento\Framework\Controller\Result\JsonFactory
+	 */
+	protected $resultJsonFactory;
 
-    /**
-     * @type CaptchaData
-     */
-    protected $captchaHelper;
+	/**
+	 * @type \Magento\Captcha\Helper\Data
+	 */
+	protected $captchaHelper;
 
-    /**
-     * @type Data
-     */
-    protected $socialHelper;
+	/**
+	 * @type \Mageplaza\SocialLogin\Helper\Data
+	 */
+	protected $socialHelper;
 
-    /**
-     * @param Context $context
-     * @param Session $customerSession
-     * @param AccountManagementInterface $customerAccountManagement
-     * @param Escaper $escaper
-     * @param JsonFactory $resultJsonFactory
-     * @param CaptchaData $captchaHelper
-     * @param Data $socialHelper
-     */
-    public function __construct(
-        Context $context,
-        Session $customerSession,
-        AccountManagementInterface $customerAccountManagement,
-        Escaper $escaper,
-        JsonFactory $resultJsonFactory,
-        CaptchaData $captchaHelper,
-        Data $socialHelper
-    ) {
-        $this->session = $customerSession;
-        $this->customerAccountManagement = $customerAccountManagement;
-        $this->escaper = $escaper;
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->captchaHelper = $captchaHelper;
-        $this->socialHelper = $socialHelper;
+	/**
+	 * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Customer\Model\Session $customerSession
+	 * @param \Magento\Customer\Api\AccountManagementInterface $customerAccountManagement
+	 * @param \Magento\Framework\Escaper $escaper
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Captcha\Helper\Data $captchaHelper
+	 * @param \Mageplaza\SocialLogin\Helper\Data $socialHelper
+	 */
+	public function __construct(
+		Context $context,
+		Session $customerSession,
+		AccountManagementInterface $customerAccountManagement,
+		Escaper $escaper,
+		JsonFactory $resultJsonFactory,
+		\Magento\Captcha\Helper\Data $captchaHelper,
+		\Mageplaza\SocialLogin\Helper\Data $socialHelper
+	)
+	{
+		$this->session                   = $customerSession;
+		$this->customerAccountManagement = $customerAccountManagement;
+		$this->escaper                   = $escaper;
+		$this->resultJsonFactory         = $resultJsonFactory;
+		$this->captchaHelper             = $captchaHelper;
+		$this->socialHelper              = $socialHelper;
 
-        parent::__construct($context);
-    }
+		parent::__construct($context);
+	}
 
-    /**
-     * @return bool
-     */
-    public function checkCaptcha()
-    {
-        $formId = 'user_forgotpassword';
-        $captchaModel = $this->captchaHelper->getCaptcha($formId);
-        $resolve = $this->socialHelper->captchaResolve($this->getRequest(), $formId);
+	/**
+	 * Forgot customer password action
+	 *
+	 * @return \Magento\Framework\Controller\Result\Redirect
+	 */
+	public function execute()
+	{
+		/** @var \Magento\Framework\Controller\Result\Json $resultJson */
+		$resultJson = $this->resultJsonFactory->create();
 
-        return !($captchaModel->isRequired() && !$captchaModel->isCorrect($resolve));
-    }
+		$result = array(
+			'success' => false,
+			'message' => array()
+		);
 
-    /**
-     * @return $this|ResponseInterface|ResultInterface
-     * @throws Zend_Validate_Exception
-     */
-    public function execute()
-    {
-        /** @var Json $resultJson */
-        $resultJson = $this->resultJsonFactory->create();
+		$formId       = 'user_forgotpassword';
+		$captchaModel = $this->captchaHelper->getCaptcha($formId);
+		if ($captchaModel->isRequired()) {
+			if (!$captchaModel->isCorrect($this->socialHelper->captchaResolve($this->getRequest(), $formId))) {
+				$result['message'] = __('Incorrect CAPTCHA.');
 
-        $result = [
-            'success' => false,
-            'message' => []
-        ];
+				return $resultJson->setData($result);
+			}
+			$captchaModel->generate();
+			$result['imgSrc'] = $captchaModel->getImgSrc();
+		}
 
-        if (!$this->checkCaptcha()) {
-            $result['message'] = __('Incorrect CAPTCHA.');
+		/** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+		$email = (string)$this->getRequest()->getPost('email');
+		if ($email) {
+			if (!\Zend_Validate::is($email, 'EmailAddress')) {
+				$this->session->setForgottenEmail($email);
+				$result['message'][] = __('Please correct the email address.');
+			}
 
-            return $resultJson->setData($result);
-        }
+			try {
+				$this->customerAccountManagement->initiatePasswordReset(
+					$email,
+					AccountManagement::EMAIL_RESET
+				);
+				$result['success']   = true;
+				$result['message'][] = __('If there is an account associated with %1 you will receive an email with a link to reset your password.', $this->escaper->escapeHtml($email));
+			} catch (NoSuchEntityException $e) {
+				$result['success']   = true;
+				$result['message'][] = __('If there is an account associated with %1 you will receive an email with a link to reset your password.', $this->escaper->escapeHtml($email));
+				// Do nothing, we don't want anyone to use this action to determine which email accounts are registered.
+			} catch (SecurityViolationException $exception) {
+				$result['error']     = true;
+				$result['message'][] = $exception->getMessage();
+			} catch (\Exception $exception) {
+				$result['error']     = true;
+				$result['message'][] = __('We\'re unable to send the password reset email.');
+			}
 
-        /** @var Redirect $resultRedirect */
-        $email = (string) $this->getRequest()->getPost('email');
-        if ($email) {
-            if (!Zend_Validate::is($email, 'EmailAddress')) {
-                $this->session->setForgottenEmail($email);
-                $result['message'][] = __('Please correct the email address.');
-            }
+		}
 
-            try {
-                $this->customerAccountManagement->initiatePasswordReset(
-                    $email,
-                    AccountManagement::EMAIL_RESET
-                );
-                $result['success'] = true;
-                $result['message'][] = __(
-                    'If there is an account associated with %1 you will receive an email with a link to reset your password.',
-                    $this->escaper->escapeHtml($email)
-                );
-            } catch (NoSuchEntityException $e) {
-                $result['success'] = true;
-                $result['message'][] = __(
-                    'If there is an account associated with %1 you will receive an email with a link to reset your password.',
-                    $this->escaper->escapeHtml($email)
-                );
-                // Do nothing, we don't want anyone to use this action to determine which email accounts are registered.
-            } catch (SecurityViolationException $exception) {
-                $result['error'] = true;
-                $result['message'][] = $exception->getMessage();
-            } catch (Exception $exception) {
-                $result['error'] = true;
-                $result['message'][] = __('We\'re unable to send the password reset email.');
-            }
-        }
-
-        return $resultJson->setData($result);
-    }
+		return $resultJson->setData($result);
+	}
 }

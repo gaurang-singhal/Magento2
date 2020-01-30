@@ -15,14 +15,14 @@
  *
  * @category    Mageplaza
  * @package     Mageplaza_SocialLogin
- * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @copyright   Copyright (c) 2016 Mageplaza (http://www.mageplaza.com/)
  * @license     https://www.mageplaza.com/LICENSE.txt
  */
 
-use Magento\Framework\Component\ComponentRegistrar;
-
-ComponentRegistrar::register(
-    ComponentRegistrar::MODULE,
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
     'Mageplaza_SocialLogin',
     __DIR__
 );
+
+

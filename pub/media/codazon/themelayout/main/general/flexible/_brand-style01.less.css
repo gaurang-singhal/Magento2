@@ -1,0 +1,7 @@
+.brand-style01{  
+	overflow:hidden;
+    .shop-by-brand-slider{
+        .slider-arrow-style-05();/*wraper product*/
+        .owl-dots-style-01();
+    }
+}

@@ -1,0 +1,43 @@
+/*Sport*/
+@media @tablet_vertical {
+	.page-header{
+		background:@header_background;
+		.panel.wrapper{
+			border:0;
+		}
+		.header-search-container{
+			display: none;
+		}
+		/*search*/
+		.header-search-container.search-opened{
+			display: block
+		}
+		.search-trigger:before{
+			.abs-transition();
+		}		
+	}
+	.page-header{
+		.sticky-menu:not(.active){
+			margin-top:0;
+			margin-bottom:0;			
+		}
+	}
+
+}
+@media @tablet_strict{
+	.page-header .logo {
+	    margin: 10px auto 0 20px;
+	}
+}
+// Mobile
+//----------------------------
+@media @phone{
+	.page-header {
+		.mobi-cart-wrapper{
+			right: 15px;
+		}
+		.header-search{
+			right:50px;
+		}
+	}
+}

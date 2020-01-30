@@ -3,6 +3,7 @@
 namespace Storese\Phonepe\Controller\Payment;
 
 use Magento\Framework\Controller\ResultFactory;
+use Storese\Phonepe\Model\Config;
 
 class Initiate1 extends \Magento\Framework\App\Action\Action
 {
@@ -14,20 +15,25 @@ class Initiate1 extends \Magento\Framework\App\Action\Action
     protected $catalogSession;
 
     protected $quote = false;
+    protected $config;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Catalog\Model\Session $catalogSession
+        \Magento\Catalog\Model\Session $catalogSession,
+        Config $config
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
         $this->catalogSession = $catalogSession;
+        $this->config = $config;
     }
 
     public function execute()
     {
-        return $this->initiateTransactionPhonepe();
+        echo $this->config->getXClientId();
+
+//        return $this->initiateTransactionPhonepe();
     }
 
     public function initiateTransactionPhonepe()

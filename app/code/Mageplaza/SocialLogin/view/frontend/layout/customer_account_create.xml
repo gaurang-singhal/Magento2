@@ -16,14 +16,13 @@
  *
  * @category    Mageplaza
  * @package     Mageplaza_SocialLogin
- * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @copyright   Copyright (c) 2016 Mageplaza (http://www.mageplaza.com/)
  * @license     https://www.mageplaza.com/LICENSE.txt
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <body>
-        <referenceContainer name="content">
-            <block class="Mageplaza\SocialLogin\Block\Popup\Social" before="-" name="social-login-popup-authentication-social-create" ifconfig="sociallogin/general/enabled" template="Mageplaza_SocialLogin::form/social.phtml"/>
-        </referenceContainer>
-    </body>
+    <referenceContainer name="content">
+        <block class="Mageplaza\SocialLogin\Block\Popup\Social" after="-" name="social-login-popup-authentication-social-create" template="Mageplaza_SocialLogin::form/social.phtml" />
+    </referenceContainer>
+    <referenceBlock name="social-login-popup" remove="true"/>
 </page>

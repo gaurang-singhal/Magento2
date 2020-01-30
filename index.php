@@ -33,7 +33,7 @@ HTML;
     exit(1);
 }
 switch($_SERVER['HTTP_HOST']) {
-    case 'mkretail.mag.`storese.in':
+    case 'mkretail.mag.storese.in':
         $mageRunCode = 'mkretail_web';
         $mageRunType = 'website';
     break;
@@ -56,7 +56,11 @@ switch($_SERVER['HTTP_HOST']) {
     case 'boat.mag.storese.in':
         $mageRunCode = 'boat_web';
         $mageRunType = 'website';
-    break;
+	break;
+    case 'themancompany.mag.storese.in':
+        $mageRunCode = 'themancompany_web';
+        $mageRunType = 'website';
+        break;
     default:
         $mageRunCode = 'base';
         $mageRunType = 'website';

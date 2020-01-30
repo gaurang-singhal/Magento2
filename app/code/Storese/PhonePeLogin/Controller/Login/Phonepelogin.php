@@ -8,6 +8,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Storese\Phonepe\Helper\Api as helper;
+use Storese\Phonepe\Model\Config;
 
 class Phonepelogin extends \Magento\Framework\App\Action\Action
 {
@@ -21,6 +22,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
     protected $storeManager;
     protected $customerFactory;
     protected $_customerSession;
+    protected $config;
 
     public function __construct(
         Context $context,
@@ -32,7 +34,8 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         helper $helper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        Config $config
     )
     {
         $this->resultJsonFactory = $resultJsonFactory;
@@ -44,6 +47,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
         $this->storeManager = $storeManager;
         $this->customerFactory = $customerFactory;
         $this->_customerSession = $customerSession;
+        $this->config = $config;
 
         return parent::__construct($context);
     }
@@ -83,24 +87,24 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
             }
         }
         $this->logger->info('$response : ' . json_encode($response));
-//        $this->logger->info('$response : ' . $response);
         return $response;
-        // return $this->jsonHelper->jsonDecode($apiResponse);
     }
 
     public function fetchAuthToken($request)
     {
         $grantToken = $request['phonePeResp'];
         $this->logger->info('$grantToken : ' . $grantToken);
-        $url = 'https://apps-uat.phonepe.com/v3/service/auth/access';
+        $url = $this->config->getApiHost() . '/v3/service/auth/access';
         $fields = [
             "grantToken" => $grantToken
         ];
+        $salt_key = $this->config->getSaltKey1();
+        $salt_index = $this->config->getSaltIndex1();
         $fields_string = base64_encode(json_encode($fields));
-        $x_verify = hash('sha256', $fields_string . '/v3/service/auth/access' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###' . '1';
+        $x_verify = hash('sha256', $fields_string . '/v3/service/auth/access' . $salt_key) . '###' . $salt_index;
         $headers = [
             'content-type: application/json',
-            'x-client-id: ' . 'PERPULENTEST',
+            'x-client-id: ' . $this->config->getXClientId(),
             'x-verify: ' . $x_verify
         ];
         $data = [
@@ -113,11 +117,13 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
 
     public function getUserDetailsFromPhonePe($accessToken)
     {
-        $url = 'https://apps-uat.phonepe.com/v3/service/userdetails';
-        $x_verify = hash('sha256', '/v3/service/userdetails' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###' . '1';
+        $url = $this->config->getApiHost() . '/v3/service/userdetails';
+        $salt_key = $this->config->getSaltKey1();
+        $salt_index = $this->config->getSaltIndex1();
+        $x_verify = hash('sha256', '/v3/service/userdetails' . $salt_key) . '###' . $salt_index;
         $headers = [
             'content-type:application/json',
-            'x-client-id:' . 'PERPULENTEST',
+            'x-client-id:' . $this->config->getXClientId(),
             'x-verify:' . $x_verify,
             'x-access-token:' . $accessToken
         ];

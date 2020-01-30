@@ -1,0 +1,25 @@
+/* Service banner */
+/* + ---- style 1*/
+@service-banner-text-01: #000000;
+@service-banner-hover-text-01: #727171;
+
+/* + ---- style 3*/
+@service-banner-background: #06943f;
+@service-banner-title: #fff;
+@service-banner-hover-title: #2cc067;
+@service-banner-text: #fff;
+@service-banner-hover-text: #2cc067;
+@service-banner-icon: #06943f;
+@service-banner-hover-icon: #2cc067;
+@service-banner-icon-border: #2cc067;
+@service-banner-hover-icon-border: #2cc067;
+
+/* Product listing */
+@product_top_background: #ffffff;
+@product_info_background: #dfece5;
+@banner_title: #f59601;
+
+/* Mobile Search */
+@mobile_small_search_border: #ccc;
+@mobile_small_search_text: #282828;
+@mobile_small_search_font: ~'400 13px/1.35 Open Sans, Helvetica Neue, Verdana, Arial, sans-serif';
