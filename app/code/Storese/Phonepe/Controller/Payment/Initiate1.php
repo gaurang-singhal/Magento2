@@ -17,23 +17,79 @@ class Initiate1 extends \Magento\Framework\App\Action\Action
     protected $quote = false;
     protected $config;
 
+    protected $curlFactory;
+    protected $jsonHelper;
+    protected $logger;
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Catalog\Model\Session $catalogSession,
+        \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Payment\Model\Method\Logger $logger,
         Config $config
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
         $this->catalogSession = $catalogSession;
+        $this->curlFactory = $curlFactory;
+        $this->jsonHelper = $jsonHelper;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     public function execute()
     {
-        echo $this->config->getXClientId();
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test12.log');
+        $this->logger = new \Zend\Log\Logger();
+        $this->logger->addWriter($writer);
+//        echo $this->getUserDetailsFromPhonePe('AUTH67e63ef3e878409f96b3d3070da5ae6cb90c07fe2b83f6dc28a34a47e9c62cbd');
+        $this->logger->info($this->getUserDetailsFromPhonePe('AUTH24878256a39a2a6b67123027aab2a4a3e49358bac9f1ba9c5eaba2851be959f2'));
 
 //        return $this->initiateTransactionPhonepe();
+    }
+
+    public function getUserDetailsFromPhonePe($accessToken)
+    {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test12.log');
+        $this->logger = new \Zend\Log\Logger();
+        $this->logger->addWriter($writer);
+
+        $url = 'https://apps-uat.phonepe.com/v3/service/userdetails';
+        $salt_key = $this->config->getSaltKey1();
+        $salt_index = $this->config->getSaltIndex1();
+        $x_verify = hash('sha256', '/v3/service/userdetails' . '33fba4d9-a996-4aee-b45e-49e2ddfcda61') . '###1';
+        $headers = [
+            'content-type:application/json',
+            'x-client-id:' . 'PERPULETEST',
+            'x-verify:' . $x_verify,
+            'x-access-token:' . $accessToken
+        ];
+
+        $response = $this->callCurlInitGet($url, $headers);
+        $this->logger->info('url : ' . json_encode($url));
+        $this->logger->info('headers : ' . json_encode($headers));
+        $this->logger->info('$response : ' . json_encode($response));
+//        print_r($url . '\r\n');
+//        echo 'headers : ' . json_encode($headers) . '\r\n';
+        echo json_encode($response);
+        return ($response);
+    }
+
+    public function callCurlInitGet($url, $headers)
+    {
+        $httpAdapter = $this->curlFactory->create();
+        $httpAdapter->write(
+            \Zend_Http_Client::GET,
+            $url,
+            '1.1',
+            $headers
+        );
+        $result = $httpAdapter->read();
+        $body = \Zend_Http_Response::extractBody($result);
+        return $body;
     }
 
     public function initiateTransactionPhonepe()

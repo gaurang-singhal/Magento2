@@ -1,6 +1,6 @@
 <?php
 
-namespace Storese\Phonepe\Helper;
+namespace Storese\PhonepeLogin\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 
