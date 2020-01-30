@@ -132,26 +132,31 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
     public function loginPhonepeUser($data)
     {
         $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
-
+        
         // Instantiate object (this is the most important part)
         $customer = $this->customerFactory->create();
         $customer->setWebsiteId($websiteId);
 //        $login = $this->getRequest()->getParams();
+        $email = $data["email"];
         $mobile_number = $data["phoneNumber"];
         $customer_name = $data["name"];
+        // $customerCollection = $customer->getCollection()
+        //     ->addAttributeToSelect("*")
+        //     ->addAttributeToFilter("mobile_number", ["eq" => $mobile_number])
+        //     ->load();
         $customerCollection = $customer->getCollection()
             ->addAttributeToSelect("*")
-            ->addAttributeToFilter("mobile_number", ["eq" => $mobile_number])
+            ->addAttributeToFilter("customer_email", ["eq" => $customer_email])
             ->load();
         if (sizeof($customerCollection) > 0) {
             $this->logger->info('$customerCollection : ' . json_encode($customerCollection));
-            $mail_id = '';
-            foreach ($customerCollection as $key => $customerdata) {
-                $this->logger->info('customerdata : ' . json_encode($customerdata));
-                $mail_id = $customerdata['email'];
-            }
-            $this->logger->info('mail_id : ' . $mail_id);
-            $this->Login($mail_id);
+            // $mail_id = '';
+            // foreach ($customerCollection as $key => $customerdata) {
+            //     $this->logger->info('customerdata : ' . json_encode($customerdata));
+            //     $mail_id = $customerdata['email'];
+            // }
+            $this->logger->info('mail_id : ' . $email);
+            $this->Login($email);
             return true;
         } else {
             $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
@@ -162,7 +167,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
             $customer = $this->customerFactory->create();
             $customer->setWebsiteId($websiteId);
 
-            $customer->setEmail($mobile_number . "@perpuledata.com");
+            $customer->setEmail($email);
             $customer->setFirstname($firstName);
             $customer->setLastname($lastName);
             $customer->setMobileNumber($mobile_number);
@@ -170,7 +175,7 @@ class Phonepelogin extends \Magento\Framework\App\Action\Action
             $customer->setForceConfirmed(true);
             $customer->save();
             $this->logger->info('customer : ' . json_encode($customer));
-            $this->Login($mobile_number . "@perpuledata.com");
+            $this->Login($email);
             return true;
         }
     }

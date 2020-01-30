@@ -47,7 +47,6 @@ require(
             //set a loader in background
             sdk.fetchAuthToken().then((res) => {
                 console.log("Grant token data received = " + JSON.stringify(res));
-                // this.loginPhonePe(res);
                 url.setBaseUrl(window.BASE_URL);
                 $.ajax({
                         type: 'POST',
@@ -86,6 +85,4 @@ require(
                 console.log("Error occurred while fetching the grant token: " + err)
             })
         })
-
-
     });
