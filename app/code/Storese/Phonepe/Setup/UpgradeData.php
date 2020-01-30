@@ -23,7 +23,7 @@ namespace Storese\Phonepe\Setup;
         }
         public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
         {
-            if (version_compare($context->getVersion(), '0.0.1', '<')) {
+            if (version_compare($context->getVersion(), '0.0.2', '<')) {
                 $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
 
                 $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
@@ -36,15 +36,18 @@ namespace Storese\Phonepe\Setup;
                  * customer registration form default field mobile number
                  */
                 $customerSetup->addAttribute(Customer::ENTITY, 'mobile_number', [
-                  'type' => 'varchar',
-                  'label' => 'Mobile Number',
-                  'input' => 'text',
-                  'required' => true,
-                  'visible' => true,
-                  'user_defined' => true,
-                  'sort_order' => 1000,
-                  'position' => 1000,
-                  'system' => 0,
+                    'type' => 'varchar',
+                    'label' => 'Mobile Number',
+                    'input' => 'text',
+                    'required' => true,
+                    'unique' => true,
+                    'visible' => true,
+                    'user_defined' => true,
+                    'sort_order' => 1000,
+                    'position' => 1000,
+                    'system' => 0,
+                    'is_used_in_grid' => true,
+                    'is_visible_in_grid' => true,
                   ]);
                 //add attribute to attribute set
                 $attribute = $customerSetup->getEavConfig()->getAttribute(Customer::ENTITY, 'mobile_number')
